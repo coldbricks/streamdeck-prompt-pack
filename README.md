@@ -1,6 +1,6 @@
 # Programming a Stream Deck with an AI — the prompt pack
 
-**Rendered version with the deck tour:** https://coldbricks.github.io/streamdeck-prompt-pack/
+**Rendered version with the deck tour:** https://finallyvr.com/streamdeck-prompt-pack/
 
 Plain-text companion to the build pack page. Send prompts one at a time, in order,
 reading the reply before sending the next. If you only send two, send 1 and 3.
