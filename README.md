@@ -51,7 +51,7 @@ Then propose a page plan as literal ASCII grids — one grid per page, one cell 
 
 - A section color scheme. Group keys into families (agents / dev / apps / projects / whatever fits me) and give each family its own ground color, so I find keys by color and never have to read the deck.
 - Two navigation keys pinned to the SAME position on every single page: back and forward. Page turns must never move under my thumb. The last page's forward key goes home. Those two slots are reserved on every page — nothing else ever lives there.
-- A dial map where every dial does something on EVERY page. A dial that's dead on page 3 feels like broken hardware.
+- A dial map where every dial does something on EVERY page. A dial that's dead on page 3 feels like broken hardware. Reserve the leftmost dial as a zoom knob everywhere: turn = zoom in / zoom out (Ctrl+= / Ctrl+-; Cmd on a Mac), press = reset to 100% (Ctrl+0). It earns that slot on every single page.
 - A safe-arm interlock on anything destructive or irreversible: a deliberate arm step with a short timeout before the key will fire, and a cold press that does nothing but report. One fat thumb must never be enough.
 
 Show me the grids and wait for my edits. Don't build yet.
