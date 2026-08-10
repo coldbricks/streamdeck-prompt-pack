@@ -47,11 +47,11 @@ Then give me a table of what's on my deck today, the exact backup command you'd 
 
 Now design my deck on paper before you build anything. Ask me at most 8 questions to learn: which apps I live in, what I do twenty times a day, what deserves one key versus a whole page, whether I want text/prompt macros, and what I want on the dials.
 
-Then propose a page plan as literal ASCII grids — one grid per page, one cell per key, at my deck's real dimensions — plus:
+Then propose a page plan as literal ASCII grids — one grid per page, one cell per key, at the real dimensions you measured in recon. This plan must fit MY deck, whatever size it is — a 6-key Mini, a 15-key, a 32-key XL, or a deck with dials — never a size you assumed. Plus:
 
 - A section color scheme. Group keys into families (agents / dev / apps / projects / whatever fits me) and give each family its own ground color, so I find keys by color and never have to read the deck.
-- Two navigation keys pinned to the SAME position on every single page: back and forward. Page turns must never move under my thumb. The last page's forward key goes home. Those two slots are reserved on every page — nothing else ever lives there.
-- A dial map where every dial does something on EVERY page. A dial that's dead on page 3 feels like broken hardware. Reserve the leftmost dial as a zoom knob everywhere: turn = zoom in / zoom out (Ctrl+= / Ctrl+-; Cmd on a Mac), press = reset to 100% (Ctrl+0). It earns that slot on every single page.
+- Two navigation keys pinned to the SAME position on every single page: back and forward. Page turns must never move under my thumb. The last page's forward key goes home. Those two slots are reserved on every page — nothing else ever lives there. (On a tiny deck like a 6-key Mini, one reserved page-cycle key is enough — same rule, half the cost.)
+- If my deck has dials: a dial map where every dial does something on EVERY page. A dial that's dead on page 3 feels like broken hardware. Reserve the leftmost dial as a zoom knob everywhere: turn = zoom in / zoom out (Ctrl+= / Ctrl+-; Cmd on a Mac), press = reset to 100% (Ctrl+0). It earns that slot on every single page. No dials? Skip this bullet — nothing else changes.
 - A safe-arm interlock on anything destructive or irreversible: a deliberate arm step with a short timeout before the key will fire, and a cold press that does nothing but report. One fat thumb must never be enough.
 
 Show me the grids and wait for my edits. Don't build yet.
@@ -89,7 +89,7 @@ Rules already paid for in someone else's lost weekend:
 - Bake the label INTO the key image and set "ShowTitle": false — note ShowTitle lives in the action's States[0] object next to "Image", NOT in Settings. The app's own title chrome is ugly and can't be styled.
 - To launch something: action UUID "com.elgato.streamdeck.system.open", Settings = {"openInBrowser": false, "path": "<full path to a .cmd wrapper>"}. The Open action cannot run a .ps1 directly — always wrap PowerShell in a .cmd. And make launcher wrappers focus-or-launch: if the app's window already exists, raise it instead of spawning a second instance — a launcher key pressed twice should never mean two copies running. Save every wrapper as ASCII or UTF-8 with BOM — PowerShell 5.1 reads a BOM-less file as ANSI, and one stray em dash becomes a bogus parse error pointing at the wrong line.
 - To type something: action UUID "com.elgato.streamdeck.system.text", full text in "pastedText", "isTypingMode": false (clipboard paste, instant), and "isSendingEnter" true or false depending on whether that key should submit.
-- Dials that run a command are wired as the SAME direct Open action as a key, with the image set on the Open action itself. Never wrap a single command in an Action Wheel: a one-child wheel opens a picker UI on press and the command never fires — the dial just looks dead.
+- Dials (if the deck has them) that run a command are wired as the SAME direct Open action as a key, with the image set on the Open action itself. Never wrap a single command in an Action Wheel: a one-child wheel opens a picker UI on press and the command never fires — the dial just looks dead.
 
 Then write me a validator script that opens the built package and fails loudly on: any action referencing a missing image, a Default page that appears in Pages[], case-mismatched folder names, non-UUID strings, dead dials, and any key whose label doesn't match the command it fires. Run it and show me it passing before we go anywhere near the live store.
 
@@ -138,7 +138,7 @@ Animate a key only when motion is doing a job:
 
 Do not animate: app launchers, folder shortcuts, text macros, anything I press dozens of times a day, and anything sitting in a block of similar keys. Those want to be instantly recognizable, which means they want to hold still.
 
-Budget: at most two or three animated surfaces visible at once (the dial strip counts as one). If you think a fourth earns it, tell me why first. Also propose which keys should animate CONDITIONALLY — swapping to the GIF only when that thing is actually running or armed, and sitting on a static PNG otherwise. That's better than a permanent loop in almost every case (the swap itself is an install-time choice or a proper plugin's job — never a script hot-editing the live store while the app runs).
+Budget: at most two or three animated surfaces visible at once (the dial strip, if you have one, counts as one). If you think a fourth earns it, tell me why first. Also propose which keys should animate CONDITIONALLY — swapping to the GIF only when that thing is actually running or armed, and sitting on a static PNG otherwise. That's better than a permanent loop in almost every case (the swap itself is an install-time choice or a proper plugin's job — never a script hot-editing the live store while the app runs).
 
 The math, which is where everyone gets burned — GIF frame delays are in CENTIseconds:
 
