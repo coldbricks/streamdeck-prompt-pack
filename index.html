@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Program Your Stream Deck With AI — a build pack</title>
+<style>
+  :root {
+    --bg: #f4f3f7;
+    --surface: #ffffff;
+    --surface-2: #eceaf3;
+    --ink: #16131f;
+    --ink-2: #4a4459;
+    --ink-3: #7a7389;
+    --rule: #ddd9e6;
+    --accent: #6b46e8;
+    --accent-soft: #efeafd;
+    --warn: #b3120a;
+    --warn-soft: #fdeceb;
+    --k-ai: #7c5cf0;
+    --k-dev: #0f9b8e;
+    --k-app: #2f74d0;
+    --k-proj: #a9741a;
+    --k-edge: #c2610a;
+    --k-nerve: #c40000;
+    --mono: "Cascadia Mono", Consolas, "SF Mono", ui-monospace, monospace;
+    --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d0a14;
+      --surface: #16121f;
+      --surface-2: #1e192b;
+      --ink: #ece9f4;
+      --ink-2: #b3abc4;
+      --ink-3: #837b96;
+      --rule: #2c2540;
+      --accent: #a78bfa;
+      --accent-soft: #241d3a;
+      --warn: #ff6b60;
+      --warn-soft: #2c1512;
+      --k-ai: #a78bfa;
+      --k-dev: #2dd4bf;
+      --k-app: #60a5fa;
+      --k-proj: #fbbf24;
+      --k-edge: #f59e0b;
+      --k-nerve: #e10600;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d0a14;
+    --surface: #16121f;
+    --surface-2: #1e192b;
+    --ink: #ece9f4;
+    --ink-2: #b3abc4;
+    --ink-3: #837b96;
+    --rule: #2c2540;
+    --accent: #a78bfa;
+    --accent-soft: #241d3a;
+    --warn: #ff6b60;
+    --warn-soft: #2c1512;
+    --k-ai: #a78bfa;
+    --k-dev: #2dd4bf;
+    --k-app: #60a5fa;
+    --k-proj: #fbbf24;
+    --k-edge: #f59e0b;
+    --k-nerve: #e10600;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16.5px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 22px 96px; }
+
+  /* ---- masthead ---- */
+  header.top {
+    padding: 68px 0 30px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(30px, 5.4vw, 46px);
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .dek { margin: 0; max-width: 62ch; color: var(--ink-2); font-size: 17.5px; }
+
+  section { padding-top: 52px; }
+  h2 {
+    margin: 0 0 6px;
+    font-size: 25px;
+    letter-spacing: -0.018em;
+    font-weight: 680;
+    text-wrap: balance;
+  }
+  h3 { margin: 30px 0 8px; font-size: 17.5px; letter-spacing: -0.008em; }
+  .sub { margin: 0 0 22px; color: var(--ink-2); max-width: 64ch; }
+  p { max-width: 68ch; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.885em;
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+
+  /* ---- prompt blocks ---- */
+  .prompt {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    margin: 18px 0 30px;
+    overflow: hidden;
+  }
+  .prompt-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 13px 16px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+  .step {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+  .prompt-title { font-weight: 650; font-size: 15.5px; letter-spacing: -0.005em; }
+  .prompt-when { color: var(--ink-3); font-size: 13px; margin-left: auto; }
+  .prompt pre {
+    margin: 0;
+    padding: 18px 16px 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.66;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: var(--ink);
+  }
+  .copy {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-top: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-3);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 11px;
+    cursor: pointer;
+  }
+  .copy:hover { background: var(--accent-soft); color: var(--accent); }
+  .copy:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  /* ---- laws ---- */
+  .laws { display: flex; flex-direction: column; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+  .law { background: var(--surface); padding: 15px 17px; display: grid; grid-template-columns: 190px 1fr; gap: 4px 22px; }
+  .law b { font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.03em; color: var(--warn); font-weight: 700; text-transform: uppercase; }
+  .law span { color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
+  @media (max-width: 620px) { .law { grid-template-columns: 1fr; } }
+
+  .callout {
+    background: var(--warn-soft);
+    border-left: 3px solid var(--warn);
+    padding: 14px 18px;
+    border-radius: 0 6px 6px 0;
+    margin: 22px 0;
+  }
+  .callout p { margin: 0; max-width: none; font-size: 15px; color: var(--ink); }
+  .callout strong { color: var(--warn); }
+
+  /* ---- deck grids ---- */
+  .deck { margin: 26px 0 8px; }
+  .deck-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .deck-name {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .deck-note { color: var(--ink-3); font-size: 13.5px; }
+  .gridscroll { overflow-x: auto; padding-bottom: 6px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(9, minmax(74px, 1fr));
+    gap: 5px;
+    min-width: 700px;
+  }
+  .cap {
+    aspect-ratio: 1 / 1;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.2;
+    color: var(--ink-2);
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+  .cap.ai { border-color: color-mix(in srgb, var(--k-ai) 45%, var(--rule)); color: var(--k-ai); }
+  .cap.dev { border-color: color-mix(in srgb, var(--k-dev) 45%, var(--rule)); color: var(--k-dev); }
+  .cap.app { border-color: color-mix(in srgb, var(--k-app) 45%, var(--rule)); color: var(--k-app); }
+  .cap.proj { border-color: color-mix(in srgb, var(--k-proj) 45%, var(--rule)); color: var(--k-proj); }
+  .cap.edge { border-color: color-mix(in srgb, var(--k-edge) 45%, var(--rule)); color: var(--k-edge); }
+  .cap.nerve { border-color: color-mix(in srgb, var(--k-nerve) 50%, var(--rule)); color: var(--k-nerve); }
+  .cap.nav { background: var(--surface-2); color: var(--ink-3); border-style: dashed; }
+  .cap.hero { background: var(--k-nerve); color: #0a0000; border-color: var(--k-nerve); font-size: 20px; font-weight: 700; }
+  .dials {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+    margin-top: 7px;
+    min-width: 700px;
+  }
+  .dial {
+    border: 1px solid var(--rule);
+    border-radius: 40px;
+    background: var(--surface-2);
+    padding: 7px 4px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+
+  .kit { border-top: 1px solid var(--rule); margin-top: 34px; padding-top: 22px; }
+  .kit dl { display: grid; grid-template-columns: 210px 1fr; gap: 8px 22px; margin: 0; }
+  .kit dt { font-family: var(--mono); font-size: 12.5px; color: var(--ink); padding-top: 2px; }
+  .kit dd { margin: 0; color: var(--ink-2); font-size: 14.5px; }
+  @media (max-width: 620px) { .kit dl { grid-template-columns: 1fr; gap: 2px 0; } .kit dd { margin-bottom: 12px; } }
+
+  footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--rule); color: var(--ink-3); font-size: 13.5px; }
+  .sig { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; }
+  .sig-name {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+  }
+  .sig-rule { flex: 0 0 46px; height: 1px; background: var(--accent); }
+  .sig-org {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Build pack · Elgato Stream Deck · D. Lombardo / Coldbricks</div>
+  <h1>Stop clicking through the Elgato app. <em>Let the model write the profile.</em></h1>
+  <p class="dek">A Stream Deck profile is just a folder of JSON and PNGs on disk. Once an AI knows that — and knows the six or seven undocumented rules that eat your pages when you get them wrong — it can build the whole deck for you: real vendor logos, animated keys at 50 FPS, launchers, prompt macros, the lot. Below: seven prompts to paste in order, the laws that cost me a weekend, and a tour of what's on my deck right now. Windows throughout — on a Mac, have the AI ground-truth the store location and format first.</p>
+</header>
+
+<section>
+  <h2>Read this first</h2>
+  <p class="sub">Four things to tell your AI up front, or it will default to walking you through menus.</p>
+  <div class="kit">
+    <dl>
+      <dt>It's files, not clicks</dt>
+      <dd>The live store is <code>%APPDATA%\Elgato\StreamDeck\ProfilesV3\</code>. Each profile is a folder; each page is a subfolder with a <code>manifest.json</code> and an <code>Images/</code> directory. A model can read, write, validate, and diff all of it.</dd>
+      <dt>Art is HTML you screenshot</dt>
+      <dd>Key art gets rendered as a tiny HTML page, screenshotted with headless Chrome at 3× and downsampled to 288×288 with ImageMagick. That means gradients, real SVG logos, and baked-in labels — all in code you can re-run.</dd>
+      <dt>Animated GIFs work</dt>
+      <dd>On keys <em>and</em> on the dial strip, at ~50 FPS. Spend them on two or three keys that carry state, not on all thirty-four (two of the 36 are the reserved page-turn arrows) — a deck where everything moves is a deck where nothing reads. There's a trap in the frame math too; prompt 5 has both.</dd>
+      <dt>Don't elevate</dt>
+      <dd>The store lives under <code>%APPDATA%</code>, so your normal user already owns it — and elevated shells actually break the flow: different PATH (python and magick vanish), denied writes. The only UAC prompt in the whole process belongs to <code>StreamDeck.exe</code> itself, and ShellExecute raises it for you. If a store write is denied, the app is still running — quit it properly instead of reaching for Administrator.</dd>
+    </dl>
+  </div>
+</section>
+
+<section>
+  <h2>The prompt pack</h2>
+  <p class="sub">Paste them in order, one per message, reading the reply before you send the next. If you only send two, send 1 and 3.</p>
+
+  <div class="prompt">
+    <div class="prompt-head"><span class="step">01</span><span class="prompt-title">Recon — look, don't touch</span><span class="prompt-when">send first</span></div>
+<pre>I have an Elgato Stream Deck. I want YOU to program it by writing its profile files directly, not by me clicking around in the Elgato app. This first message is read-only recon — do not write or change anything yet.
+
+Find and report:
+
+1. My device. Read %APPDATA%\Elgato\StreamDeck\ProfilesV3\ — list every *.sdProfile folder, and for each one open manifest.json and report "Name", "Device.Model" (the model string, e.g. 20GBX9901 = Stream Deck + XL) and "Device.UUID" (it embeds vid/pid/serial).
+
+2. The grid. From any page manifest, report the highest "col,row" key coordinate and how many Encoder (dial) slots exist. Confirm the exact key count so we never build a page that doesn't fit.
+
+3. The pages. For each page folder: its "Name", how many keypad and encoder actions it holds, and the distinct action UUIDs in use (that tells us which plugins I already have).
+
+4. My tools. Check whether python, magick (ImageMagick) and Chrome are on PATH. Report versions or MISSING — don't install anything yet.
+
+5. Whether the Stream Deck app is currently running, where the exe lives, and its version — the build step later embeds the app version in the package, so capture it now.
+
+Then give me a table of what's on my deck today, the exact backup command you'd run before touching anything, and your plan in one paragraph. Ask me before you write a single file.</pre>
+    <button class="copy" type="button">Copy prompt</button>
+  </div>
+
+  <div class="prompt">
+    <div class="prompt-head"><span class="step">02</span><span class="prompt-title">Design the deck before building it</span><span class="prompt-when">after recon</span></div>
+<pre>Now design my deck on paper before you build anything. Ask me at most 8 questions to learn: which apps I live in, what I do twenty times a day, what deserves one key versus a whole page, whether I want text/prompt macros, and what I want on the dials.
+
+Then propose a page plan as literal ASCII grids — one grid per page, one cell per key, at my deck's real dimensions — plus:
+
+- A section color scheme. Group keys into families (agents / dev / apps / projects / whatever fits me) and give each family its own ground color, so I find keys by color and never have to read the deck.
+- Two navigation keys pinned to the SAME position on every single page: back and forward. Page turns must never move under my thumb. The last page's forward key goes home. Those two slots are reserved on every page — nothing else ever lives there.
+- A dial map where every dial does something on EVERY page. A dial that's dead on page 3 feels like broken hardware.
+- A safe-arm interlock on anything destructive or irreversible: a deliberate arm step with a short timeout before the key will fire, and a cold press that does nothing but report. One fat thumb must never be enough.
+
+Show me the grids and wait for my edits. Don't build yet.</pre>
+    <button class="copy" type="button">Copy prompt</button>
+  </div>
+
+  <div class="prompt">
+    <div class="prompt-head"><span class="step">03</span><span class="prompt-title">Build the profile — with the format doctrine</span><span class="prompt-when">the big one</span></div>
+<pre>Build the profile now by generating a .streamDeckProfile package (it's just a ZIP) with a script I can re-run — not by hand-editing the live store. Write the script so every key's label, icon and command live in ONE list at the top of the file. I'll be editing that list for years.
+
+Two gates before you write anything: if this conversation never did the read-only recon, go read the live store and app version now — never invent those values. And if we never agreed a page plan, show me one and wait for my yes.
+
+Package layout (this is ground truth, don't improvise it):
+
+  package.json                                                    at the zip root
+  Profiles/&lt;PROFILE-UUID&gt;.sdProfile/manifest.json
+  Profiles/&lt;PROFILE-UUID&gt;.sdProfile/Profiles/&lt;PAGE-UUID&gt;/manifest.json
+  Profiles/&lt;PROFILE-UUID&gt;.sdProfile/Profiles/&lt;PAGE-UUID&gt;/Images/*.png
+
+package.json is not empty — a real one from a working package looks like this; match the shape and fill in the values you found during recon:
+
+  {"AppVersion": "&lt;installed Stream Deck version&gt;", "DeviceModel": "&lt;model string&gt;",
+   "DeviceSettings": null, "FormatVersion": 1, "OSType": "Windows",
+   "OSVersion": "&lt;from the OS&gt;",
+   "RequiredPlugins": ["&lt;every action UUID your pages actually use, exactly as the live manifests spell them&gt;"]}
+
+Rules already paid for in someone else's lost weekend:
+
+- Page folder names on disk are UPPERCASE UUIDs; the "Pages" array in the profile manifest references them in lowercase. Get this backwards and pages silently vanish after the app reloads.
+- "Pages.Default" must point at a HIDDEN BLANK template page whose UUID is NOT in the "Pages" array. The blank page manifest is exactly:
+  {"Controllers":[{"Actions":null,"Type":"Keypad"},{"Actions":null,"Type":"Encoder"}],"Icon":"","Name":""}
+  If Default points at a real visible page, the import path silently DROPS a page and you'll spend hours thinking your builder is broken.
+- Every page manifest has "Controllers": a list containing an "Encoder" entry and a "Keypad" entry. Keys are addressed by string keys of the form "col,row".
+- Every UUID must parse as a real UUID.
+- Bake the label INTO the key image and set "ShowTitle": false — note ShowTitle lives in the action's States[0] object next to "Image", NOT in Settings. The app's own title chrome is ugly and can't be styled.
+- To launch something: action UUID "com.elgato.streamdeck.system.open", Settings = {"openInBrowser": false, "path": "&lt;full path to a .cmd wrapper&gt;"}. The Open action cannot run a .ps1 directly — always wrap PowerShell in a .cmd. And make launcher wrappers focus-or-launch: if the app's window already exists, raise it instead of spawning a second instance — a launcher key pressed twice should never mean two copies running. Save every wrapper as ASCII or UTF-8 with BOM — PowerShell 5.1 reads a BOM-less file as ANSI, and one stray em dash becomes a bogus parse error pointing at the wrong line.
+- To type something: action UUID "com.elgato.streamdeck.system.text", full text in "pastedText", "isTypingMode": false (clipboard paste, instant), and "isSendingEnter" true or false depending on whether that key should submit.
+- Dials that run a command are wired as the SAME direct Open action as a key, with the image set on the Open action itself. Never wrap a single command in an Action Wheel: a one-child wheel opens a picker UI on press and the command never fires — the dial just looks dead.
+
+Then write me a validator script that opens the built package and fails loudly on: any action referencing a missing image, a Default page that appears in Pages[], case-mismatched folder names, non-UUID strings, dead dials, and any key whose label doesn't match the command it fires. Run it and show me it passing before we go anywhere near the live store.</pre>
+    <button class="copy" type="button">Copy prompt</button>
+  </div>
+
+  <div class="prompt">
+    <div class="prompt-head"><span class="step">04</span><span class="prompt-title">Real logos — never an approximation</span><span class="prompt-when">makes or breaks the look</span></div>
+<pre>Now make the key art properly, with real vendor marks — not your approximations of them.
+
+Sources, in this order:
+
+1. Simple Icons for brand marks:
+   https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/&lt;slug&gt;.svg
+   One clean monochrome path at viewBox "0 0 24 24". Also pull
+   https://raw.githubusercontent.com/simple-icons/simple-icons/develop/data/simple-icons.json
+   and use each brand's OFFICIAL hex to tint its key, so nothing is arbitrarily colored.
+
+2. Google Material Symbols for anything that isn't a brand:
+   https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/&lt;name&gt;/materialsymbolsoutlined/&lt;name&gt;_24px.svg
+   Careful: these use viewBox "0 -960 960 960" and are FILLED paths — set fill:currentColor and stroke:none or you'll render an empty key.
+
+3. If a brand isn't in Simple Icons (Adobe apps, some AI tools, niche software), pull the official SVG or a 512px-or-larger PNG from that company's own press/brand page, and tell me which URL you used.
+
+Those URL shapes are correct as of this writing. If one 404s, the repo has moved things around — find the new path and tell me. A dead URL is never a reason to fall back to approximating.
+
+Hard rule: if you cannot find the real mark, STOP and tell me which one is missing and where you looked. Never substitute a similar-looking icon, and never hand-draw SVG path data. A wrong logo is worse than a blank key, and a hand-drawn one always looks hand-drawn at this size.
+
+Render pipeline: compose each key as a small HTML file (gradient ground, inline SVG glyph, baked label), screenshot it with headless Chrome at 3x supersample, then downsample with ImageMagick using -filter Lanczos -resize 288x288 -strip. Author at 288px even though the panel is smaller — let the software downscale. Art authored at panel resolution looks visibly soft.
+
+Go wide on color: these panels are vivid, so use deep saturated grounds with one high-contrast glyph. Keys read at a glance by color first, glyph second, text last.
+
+One more art-direction rule: name every mechanism by its real engineering term, never by a metaphor. Ask for a "safe-arm interlock" and you get clean instrument chrome; describe the same thing in figurative language and you get that figure of speech drawn literally on every key. The vocabulary I give you becomes the artwork, so keep it technical.</pre>
+    <button class="copy" type="button">Copy prompt</button>
+  </div>
+
+  <div class="prompt">
+    <div class="prompt-head"><span class="step">05</span><span class="prompt-title">Animated keys at ~50 FPS</span><span class="prompt-when">the showpiece</span></div>
+<pre>Animated GIFs work on Stream Deck keys AND on the dial / touch-strip segments, and they look incredible. Animate my hero keys — HERO keys, not all of them.
+
+Restraint first, because this is the mistake everyone makes: DO NOT animate every icon. A deck where thirty keys are moving is a slot machine — nothing reads, my eye has nothing to land on, and the one key that actually needed attention is now invisible. Static keys are the ground that makes a moving key mean something.
+
+Animate a key only when motion is doing a job:
+- it carries STATE I need to see without reading — armed, live, recording, connected, running, locked
+- it's a destructive or irreversible key I want my eye pulled to before I press it
+- it's the single signature key of a page, and the page has a lot of quiet around it
+
+Do not animate: app launchers, folder shortcuts, text macros, anything I press dozens of times a day, and anything sitting in a block of similar keys. Those want to be instantly recognizable, which means they want to hold still.
+
+Budget: at most two or three animated surfaces visible at once (the dial strip counts as one). If you think a fourth earns it, tell me why first. Also propose which keys should animate CONDITIONALLY — swapping to the GIF only when that thing is actually running or armed, and sitting on a static PNG otherwise. That's better than a permanent loop in almost every case (the swap itself is an install-time choice or a proper plugin's job — never a script hot-editing the live store while the app runs).
+
+The math, which is where everyone gets burned — GIF frame delays are in CENTIseconds:
+
+  delay 2  = 20ms/frame = ~50 FPS   <-- the practical ceiling. Use this.
+  delay 1  = 10ms/frame = ~100 FPS  <-- same cycle length needs twice the frames, twice the bytes, zero visible gain
+  delay 10 = 100ms      = 10 FPS    <-- visibly steppy on a small bright panel
+
+True 60 FPS would need 16.67ms, which the GIF format simply cannot express. Don't chase it — 50 FPS is the max and it is smooth.
+
+Rules:
+
+- Assemble with FULL frames at the key's full pixel size. Do NOT run ImageMagick's -layers optimize on the final GIF: it collapses frames into 1x1 partial deltas, and Stream Deck then rejects the file or shows garbage.
+- Windows argv limit: don't pass hundreds of frame paths to one magick call or you'll hit CreateProcess error 206. cd into the frames directory and assemble with a glob like f*.png.
+- Fast frame rate, SLOW cycle. Example: 240 frames at delay 2 is a 4.8-second breathe running at 50 FPS. High FPS buys smoothness, not speed.
+- If two animated surfaces sit near each other, give one twice the frames so its tempo is half. Matching tempos read as mechanical; offset tempos read as alive.
+- Fade all the way to pure black rather than to a dim tint — a partial fade looks like a rendering bug on this panel.
+- Always also emit a static PNG of the mid-frame as a fallback, and reference the GIF exactly like the PNGs: "Images/name.gif" on the action's Image field.
+
+Nothing installs in this step — deployment is the next prompt's ritual. Once it's deployed, verify: report the installed GIF's real pixel dimensions (1x1 means it got optimized and is broken) and confirm it's looping on the hardware.</pre>
+    <button class="copy" type="button">Copy prompt</button>
+  </div>
+
+  <div class="prompt">
+    <div class="prompt-head"><span class="step">06</span><span class="prompt-title">Deploy, verify, roll back</span><span class="prompt-when">where profiles die</span></div>
+<pre>Deploy time. Follow this ritual exactly — installing while the app is running is how profiles get corrupted.
+
+1. FULLY QUIT the Stream Deck software first, not minimize to tray. The clean way is running StreamDeck.exe with the --quit flag. Notes: taskkill without /F gets Access Denied (it's a tray app with no top-level window), and the exe's manifest demands elevation, so a plain CreateProcess call (Python subprocess) throws WinError 740 — launch it via ShellExecute instead (os.startfile in Python, Start-Process in PowerShell).
+
+2. STAY NON-ELEVATED FOR THE BUILD AND THE INSTALL. The profile store lives under %APPDATA% — your own user already owns every byte of it, and elevated shells break this flow both ways: a UAC shell can come up with a different PATH (python and magick vanish) and profile writes get denied FROM the elevated side. The only thing that ever needs elevation is StreamDeck.exe itself, and ShellExecute raises that UAC prompt for you. If a write to the store is denied, the app is still alive — go back to step 1 instead of reaching for Administrator.
+
+3. Back up %APPDATA%\Elgato\StreamDeck\ProfilesV3 to a timestamped folder. Every time. Print the path you used.
+
+4. Install by replacing the CONTENTS of the existing UUID.sdProfile folder, keeping the live folder's UUID name. Which profile the device boots into is stored in an opaque blob under HKCU\Software\Elgato Systems GmbH\StreamDeck\Devices — never patch that; reuse the existing UUID instead. (Note that importing through the GUI does not replace by name: it lands as "&lt;name&gt; copy".)
+
+5. Start the app, wait 30 seconds, then read %APPDATA%\Elgato\StreamDeck\logs\StreamDeck.log and confirm: it used the existing profile store, the device connected, and there is NO "Profile not found" and NO import of the factory DefaultProfiles package. That factory import only fires when the device has no valid profile — if you see it, we broke something.
+
+6. Quit and restart once more, then re-verify the page count. Pages that survive one load but vanish on the second are the UUID-case bug from the build prompt.
+
+7. Finally: tell me exactly what to physically press to test it, key by key, and write a ROLLBACK.txt next to the backup containing the literal restore commands.</pre>
+    <button class="copy" type="button">Copy prompt</button>
+  </div>
+
+  <div class="prompt">
+    <div class="prompt-head"><span class="step">07</span><span class="prompt-title">A page of prompt macros</span><span class="prompt-when">the real superpower</span></div>
+<pre>Add a page of prompt keys — one key equals one long instruction pasted straight into whatever text box I'm focused on.
+
+Use the action UUID "com.elgato.streamdeck.system.text" with the whole prompt in "pastedText" and "isTypingMode": false. Simulated typing is unusably slow for anything longer than a sentence; clipboard paste is instant. It does overwrite my clipboard — that's the accepted trade. (Paste mode needs app 6.9 or later — you captured my version during recon, so check it.)
+
+Split the page by intent, and be consistent about it:
+
+- SEND keys ("isSendingEnter": true) — self-contained instructions that should fire the moment I press them.
+- APPEND keys ("isSendingEnter": false) — modifiers that stack onto something I've already typed. Start each of those payloads with ", " so they graft cleanly onto a sentence in progress.
+
+Never mix the two behaviors on one page. Muscle memory can't hold the exception.
+
+Keep each key's label and its prompt body in the SAME data structure entry. If labels live in one list and bodies in another and you pair them by index, you WILL ship the wrong prompt under the wrong key, and it takes an hour of confusion to notice.
+
+Encoding trap that has shipped a real bug before: pastedText must carry real newlines. If your writer double-escapes them, the key pastes a literal backslash-n into my text box. Have the validator scan every payload for that.
+
+This page obeys the same laws as every other page: the two reserved navigation keys stay in their corners, no dial goes dead, and it ships through the same build → validate → deploy ritual — never pasted into the live store while the app is running.
+
+Give every prompt on the page a shared footer contract so outputs are comparable across keys — for example, end every one of them by demanding: VERDICT / EVIDENCE / OPEN RISKS / NEXT ACTION / STOP CONDITION.</pre>
+    <button class="copy" type="button">Copy prompt</button>
+  </div>
+</section>
+
+<section>
+  <h2>The laws</h2>
+  <p class="sub">Every one of these cost real time to find. They're embedded in the prompts above; this is the pocket version for when something goes wrong.</p>
+  <div class="laws">
+    <div class="law"><b>Pages vanish</b><span>Page folder on disk is an UPPERCASE UUID; the manifest's <code>Pages[]</code> references it lowercase. Mismatch = the page is dropped on reload.</span></div>
+    <div class="law"><b>A page eats itself</b><span><code>Pages.Default</code> must be a hidden blank page not listed in <code>Pages[]</code>. Point it at a real page and the import silently loses one.</span></div>
+    <div class="law"><b>Close the app first</b><span>Writing to the profile store while Stream Deck is running corrupts it. Quit → install → start → verify → restart → verify again.</span></div>
+    <div class="law"><b>Don't elevate</b><span>Elevated shells lose PATH and get profile writes denied. The store is under <code>%APPDATA%</code> — normal user is correct. Only <code>StreamDeck.exe</code> elevates itself; launch it via ShellExecute and let UAC do its thing.</span></div>
+    <div class="law"><b>GIF: full frames</b><span>Never <code>-layers optimize</code> a key GIF. Partial 1×1 frames make Stream Deck reject it. Delay 2cs ≈ 50 FPS is the ceiling.</span></div>
+    <div class="law"><b>magick argv limit</b><span>Hundreds of frame paths on one command line throws CreateProcess error 206. Assemble from inside the frames dir with a glob.</span></div>
+    <div class="law"><b>.cmd, not .ps1</b><span>The System &gt; Open action can't run PowerShell directly. Wrap every script in a <code>.cmd</code>.</span></div>
+    <div class="law"><b>Never pair by index</b><span>Key label and payload go in the same record. Index-pairing two lists is how you get the wrong prompt under the wrong key.</span></div>
+    <div class="law"><b>Real newlines only</b><span>Double-escaped newlines in <code>pastedText</code> paste a literal <code>\n</code> into the text box. Single-escape in the JSON, and make the validator scan every payload for strays.</span></div>
+    <div class="law"><b>Dials aren't wheels</b><span>If a dial press should run a script, wire it as a direct Open action. A single-child Action Wheel opens a UI and never fires the command.</span></div>
+    <div class="law"><b>PowerShell 5.1 + BOM</b><span>PS 5.1 reads BOM-less .ps1 as ANSI, so one em dash <em>in a comment</em> breaks the parse with a bogus error pointing at an unrelated line. Save UTF-8 with BOM, or stay ASCII.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>What's on my deck</h2>
+  <p class="sub">Stream Deck + XL — 36 keys, 6 dials, one profile, five pages. Back and forward sit at the bottom-right corners of every page, and the zoom knob is alive on all of them. This is what the prompts above actually produce.</p>
+
+  <div class="deck">
+    <div class="deck-head"><span class="deck-name" style="color:var(--k-ai)">Home / AI Workstation</span><span class="deck-note">rows by family: agents · session verbs · apps · projects</span></div>
+    <div class="gridscroll">
+      <div class="grid">
+        <div class="cap ai">Claude</div><div class="cap ai">Codex</div><div class="cap ai">Gemini</div><div class="cap ai">Grok</div><div class="cap ai">Claude web</div><div class="cap ai">ChatGPT web</div><div class="cap ai">Grok web</div><div class="cap ai">Flow</div><div class="cap ai">Dictate</div>
+        <div class="cap dev">Continue</div><div class="cap dev">New session</div><div class="cap dev">Pick agent</div><div class="cap dev">Stop</div><div class="cap dev">/model</div><div class="cap dev">/compact</div><div class="cap dev">/clear</div><div class="cap dev">Terminal</div><div class="cap dev">git status</div>
+        <div class="cap app">Typora</div><div class="cap app">Notepad++</div><div class="cap app">Chrome</div><div class="cap app">Premiere</div><div class="cap app">Photoshop</div><div class="cap app">VeraCrypt</div><div class="cap app">Docker</div><div class="cap app">Gmail</div><div class="cap app">GitHub</div>
+        <div class="cap proj">ChloeVR</div><div class="cap proj">FinallyPlayer</div><div class="cap proj">Ash Airfoil</div><div class="cap proj">ChloeVibes</div><div class="cap proj">Tripo3D</div><div class="cap proj">GPU tune</div><div class="cap proj">U:\dev</div><div class="cap proj">Headset audio</div><div class="cap nav">page ▶</div>
+      </div>
+      <div class="dials">
+        <div class="dial">ZOOM</div><div class="dial">EFFORT</div><div class="dial">SCHEME</div><div class="dial">AGENT</div><div class="dial">PROJECT</div><div class="dial">VOLUME</div>
+      </div>
+    </div>
+    <p style="font-size:14.5px;color:var(--ink-2);margin-top:12px">The four agent keys are <em>focus-or-create</em>: if that agent's window already exists, the key raises it instead of spawning a duplicate. The dials are pickers — turn to scroll options, press to apply: reasoning effort, terminal color scheme, which agent, which project directory.</p>
+  </div>
+
+  <div class="deck">
+    <div class="deck-head"><span class="deck-name" style="color:var(--k-ai)">Production LLM</span><span class="deck-note">34 keys · full structured prompt + Enter</span></div>
+    <div class="gridscroll">
+      <div class="grid">
+        <div class="cap ai">INTAKE</div><div class="cap ai">CONTEXT</div><div class="cap ai">PLAN</div><div class="cap ai">FAN OUT</div><div class="cap ai">META PROMPT</div><div class="cap ai">READ ONLY</div><div class="cap ai">REQUIRE&shy;MENTS</div><div class="cap ai">HYPOTHESIS</div><div class="cap ai">BUG TRIAGE</div>
+        <div class="cap ai">ROOT CAUSE</div><div class="cap ai">SMALLEST DIFF</div><div class="cap ai">IMPLEMENT</div><div class="cap ai">CODE REVIEW</div><div class="cap ai">SECURITY</div><div class="cap ai">PERFOR&shy;MANCE</div><div class="cap ai">INTEROP</div><div class="cap ai">TEST PLAN</div><div class="cap ai">VALIDATOR</div>
+        <div class="cap ai">RUNTIME</div><div class="cap ai">REGRESSION</div><div class="cap ai">DEVICE PROOF</div><div class="cap ai">DOCS</div><div class="cap ai">PR</div><div class="cap ai">HANDOFF</div><div class="cap ai">STATUS</div><div class="cap ai">CHALLENGE</div><div class="cap ai">SIMPLIFY</div>
+        <div class="cap ai">RELEASE</div><div class="cap ai">ROLLBACK</div><div class="cap ai">INCIDENT</div><div class="cap ai">CLARIFY</div><div class="cap ai">CONTINUE</div><div class="cap ai">STOP</div><div class="cap ai">FINAL AUDIT</div><div class="cap nav">◀ back</div><div class="cap nav">page ▶</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="deck-head"><span class="deck-name" style="color:var(--k-edge)">Edge Lab — Method Deck</span><span class="deck-note">34 named engineering methods, one per key</span></div>
+    <div class="gridscroll">
+      <div class="grid">
+        <div class="cap edge">NASA SE</div><div class="cap edge">NASA IV&amp;V</div><div class="cap edge">V&amp;V PREFLIGHT</div><div class="cap edge">NASA TRR</div><div class="cap edge">NASA FRR</div><div class="cap edge">DMAIC</div><div class="cap edge">DMADV</div><div class="cap edge">PDCA</div><div class="cap edge">A3</div>
+        <div class="cap edge">5 WHYS</div><div class="cap edge">FMEA</div><div class="cap edge">FTA</div><div class="cap edge">STPA</div><div class="cap edge">HAZOP</div><div class="cap edge">BOWTIE</div><div class="cap edge">OODA</div><div class="cap edge">SCIENTIFIC</div><div class="cap edge">DOE</div>
+        <div class="cap edge">SPC</div><div class="cap edge">TOC</div><div class="cap edge">VSM</div><div class="cap edge">KAIZEN</div><div class="cap edge">TRIZ</div><div class="cap edge">SYSTEMS</div><div class="cap edge">TRADE STUDY</div><div class="cap edge">V-MODEL</div><div class="cap edge">TDD</div>
+        <div class="cap edge">POSTMORTEM</div><div class="cap edge">SRE</div><div class="cap edge">PRE-MORTEM</div><div class="cap edge">RED TEAM</div><div class="cap edge">RISK REGISTER</div><div class="cap edge">STAGE-GATE</div><div class="cap edge">META-METHOD</div><div class="cap nav">◀ back</div><div class="cap nav">page ▶</div>
+      </div>
+    </div>
+    <p style="font-size:14.5px;color:var(--ink-2);margin-top:12px">Every key on this page ends its prompt with the same footer — DECISION / EVIDENCE / OPEN RISKS / NEXT SAFE ACTION / STOP CONDITION — so I can compare two methods' answers to the same problem side by side.</p>
+  </div>
+
+  <div class="deck">
+    <div class="deck-head"><span class="deck-name" style="color:var(--k-proj)">Raw Cam — realism chips</span><span class="deck-note">34 append-only keys · no Enter</span></div>
+    <div class="gridscroll">
+      <div class="grid">
+        <div class="cap proj">2004 compact</div><div class="cap proj">Cyber-shot party</div><div class="cap proj">Kodak household</div><div class="cap proj">90s disposable</div><div class="cap proj">2006 flip phone</div><div class="cap proj">iPhone 3GS</div><div class="cap proj">MiniDV grab</div><div class="cap proj">2008 webcam</div><div class="cap proj">security cam</div>
+        <div class="cap proj">BTS candid</div><div class="cap proj">on-cam flash</div><div class="cap proj">28mm reportage</div><div class="cap proj">mirror candid</div><div class="cap proj">working loft</div><div class="cap proj">1/30s walking</div><div class="cap proj">blown window</div><div class="cap proj">dark room</div><div class="cap proj">70-200 across room</div>
+        <div class="cap proj">Portra 400</div><div class="cap proj">expired film</div><div class="cap proj">Polaroid 600</div><div class="cap proj">VHS frame</div><div class="cap proj">flatbed scan</div><div class="cap proj">JPEG q40</div><div class="cap proj">datestamp</div><div class="cap proj">smudged lens</div><div class="cap proj">tilted horizon</div>
+        <div class="cap proj">EXIF: R5</div><div class="cap proj">EXIF: iPhone</div><div class="cap proj">DSC_0049.JPG</div><div class="cap proj">card recovery</div><div class="cap proj">repost rot</div><div class="cap proj">unretouched</div><div class="cap proj">amateur snap</div><div class="cap nav">◀ back</div><div class="cap nav">page ▶</div>
+      </div>
+    </div>
+    <p style="font-size:14.5px;color:var(--ink-2);margin-top:12px">These are the append keys from prompt 7 — each payload starts with <code>", "</code> and does <em>not</em> send Enter, so I can type a scene and then stack three camera-era chips onto the end of it before hitting go. This page is why the send/append split has to be per-page and absolute.</p>
+  </div>
+
+  <div class="deck">
+    <div class="deck-head"><span class="deck-name" style="color:var(--k-nerve)">Nerve</span><span class="deck-note">pure black keys, red glyphs, one animated hero</span></div>
+    <div class="gridscroll">
+      <div class="grid">
+        <div class="cap nerve">NO SYCO</div><div class="cap nerve">PRE-COMMIT</div><div class="cap nerve">KEEP GO</div><div class="cap nerve">NO GUESS</div><div class="cap nerve">NO LAZY</div><div class="cap nerve">NO ASK</div><div class="cap nerve">SAME TURN</div><div class="cap nerve">ADULT</div><div class="cap nerve">HIGH SIG</div>
+        <div class="cap nerve">PARALLEL</div><div class="cap nerve">MULTI SRCH</div><div class="cap nerve">TODO NOW</div><div class="cap nerve">COG TAG</div><div class="cap nerve">THINK DEV</div><div class="cap nerve">PLAN ACT</div><div class="cap nerve">ONE LOOP</div><div class="cap nerve">EXACT SR</div><div class="cap nerve">FULL FILE</div>
+        <div class="cap nerve">ROOT FIX</div><div class="cap nerve">MIN DIFF</div><div class="cap nerve">NO TESTX</div><div class="cap nerve">LIB CHK</div><div class="cap nerve">LINT GATE</div><div class="cap nerve">RUNNABLE</div><div class="cap nerve">STOP PLAN</div><div class="cap nerve">ELEGANCE</div><div class="cap nerve">JUST FIX</div>
+        <div class="cap nerve">LESSONS</div><div class="cap nerve">TODO FILE</div><div class="cap nerve">SUBAGENT</div><div class="cap nerve">MEMORY</div><div class="cap hero">Ω</div><div class="cap nerve">FULL SEND</div><div class="cap nerve">ALL IN</div><div class="cap nav">◀ back</div><div class="cap nav">home ▶</div>
+      </div>
+      <div class="dials">
+        <div class="dial">ZOOM</div><div class="dial">SAFE</div><div class="dial">KEY</div><div class="dial">ARM</div><div class="dial">STATUS</div><div class="dial">VOL+</div>
+      </div>
+    </div>
+    <p style="font-size:14.5px;color:var(--ink-2);margin-top:12px">The Ω key is the animated one: a 240-frame breathe at 20ms a frame — 4.8 seconds, 50 FPS, fading all the way to black. All six dials share one continuous red strip GIF at double the frame count, so the strip pulses at half the key's tempo. Ω also sits behind a <strong>safe-arm interlock</strong>: turn KEY three times to get to KEYED, press ARM for a 20-second armed window, then Ω fires and drops straight back to SAFE. Cold press just prints DENIED. Any key that does something you can't undo is worth guarding this way — one deliberate sequence instead of one fat thumb.</p>
+  </div>
+</section>
+
+<footer>
+  <p style="margin:0 0 14px;max-width:68ch">Everything here is verified against a live Stream Deck + XL profile store on Windows 11, 2026-08-10 — the format facts came out of ground truth on disk, not documentation. Send me a screenshot when yours boots.</p>
+  <div class="sig">
+    <span class="sig-name">D. Lombardo</span>
+    <span class="sig-rule" aria-hidden="true"></span>
+    <span class="sig-org">Coldbricks</span>
+  </div>
+</footer>
+
+</div>
+
+<script>
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = btn.parentElement.querySelector("pre");
+      navigator.clipboard.writeText(pre.innerText).then(function () {
+        var old = btn.textContent;
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = old; }, 1400);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
