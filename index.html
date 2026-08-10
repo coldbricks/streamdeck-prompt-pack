@@ -289,7 +289,7 @@
 <header class="top">
   <div class="eyebrow">Build pack · Elgato Stream Deck · D. Lombardo / Coldbricks</div>
   <h1>Stop clicking through the Elgato app. <em>Let the model write the profile.</em></h1>
-  <p class="dek">A Stream Deck profile is just a folder of JSON and PNGs on disk. Once an AI knows that — and knows the six or seven undocumented rules that eat your pages when you get them wrong — it can build the whole deck for you: real vendor logos, animated keys at 50 FPS, launchers, prompt macros, the lot. Below: seven prompts to paste in order, the laws that cost me a weekend, and a tour of what's on my deck right now. Windows throughout — on a Mac, have the AI ground-truth the store location and format first.</p>
+  <p class="dek">A Stream Deck profile is just a folder of JSON and PNGs on disk. Once an AI knows that — and knows the six or seven undocumented rules that eat your pages when you get them wrong — it can build the whole deck for you: real vendor logos, animated keys at 50 FPS, launchers, prompt macros, the lot. Below: seven prompts to paste in order, the laws that cost me a weekend, and a tour of what's on my deck right now. Windows throughout — on a Mac, read the note just before prompt 1: the format laws hold everywhere, the plumbing translates.</p>
 </header>
 
 <section>
@@ -312,6 +312,10 @@
 <section>
   <h2>The prompt pack</h2>
   <p class="sub">Paste them in order, one per message, reading the reply before you send the next. If you only send two, send 1 and 3.</p>
+
+  <div class="callout">
+    <p><strong>On a Mac?</strong> Everything format-level here is platform-independent and stays true: the package layout, the package.json shape, the UUID case law, the hidden blank Default page, the Controllers/Settings/States shapes, the action UUIDs, the icon sources, and all of the GIF math. The plumbing is Windows — tell your AI to translate four things and ground-truth each one during recon, never trusting a path it hasn't read: the store isn't under <code>%APPDATA%</code> (expect it inside <code>~/Library/Application Support/com.elgato.StreamDeck/</code> — find the ProfilesV3 folder and confirm the layout matches); there's no <code>.cmd</code> (launchers become executable shell scripts — prove ONE fires from a key before building thirty); the quit-and-elevation notes in prompt 6 are Windows plumbing (find the clean quit on macOS, try osascript telling the app to quit, prove the process is gone, and keep the rest of the ritual exactly: quit → back up → install → verify → restart → verify); and the PowerShell/BOM law doesn't apply, though the argv-limit habit still does.</p>
+  </div>
 
   <div class="prompt">
     <div class="prompt-head"><span class="step">01</span><span class="prompt-title">Recon — look, don't touch</span><span class="prompt-when">send first</span></div>

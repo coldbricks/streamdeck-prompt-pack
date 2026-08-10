@@ -5,8 +5,21 @@
 Plain-text companion to the build pack page. Send prompts one at a time, in order,
 reading the reply before sending the next. If you only send two, send 1 and 3.
 
-Assumes Windows. On macOS the profile store lives elsewhere and differs in format —
-have the AI locate and ground-truth it before trusting any layout claim below.
+Written and verified on Windows. On a Mac, read section 0 first — the format laws
+hold everywhere, the plumbing translates.
+
+---
+
+## 0 — If you're on a Mac
+
+Everything format-level in this pack is platform-independent and stays true: the package layout, the package.json shape, the UUID case law, the hidden blank Default page, the Controllers/Settings/States shapes, the action UUIDs, the icon sources, and all of the GIF math.
+
+The plumbing around it is Windows. Tell your AI to translate these four things and ground-truth each one on your machine during recon — never let it trust a path claim it hasn't read:
+
+- The profile store is not under %APPDATA%. Expect it inside ~/Library/Application Support/com.elgato.StreamDeck/ — find the ProfilesV3 folder there in prompt 1 and confirm the layout matches before believing anything.
+- There is no .cmd. Launcher wrappers become executable shell scripts (chmod +x); prove ONE fires from a key before building thirty.
+- The quit-and-elevation notes in prompt 6 (--quit, taskkill, ShellExecute, WinError 740, staying non-elevated) are Windows plumbing. Find the clean quit on macOS (try osascript telling the app to quit), prove the process is actually gone, and keep the rest of the ritual exactly: quit → back up → install → verify → restart → verify.
+- The PowerShell/BOM law doesn't apply; the argv-limit habit (cd into the frames dir, assemble with a glob) still does.
 
 ---
 
